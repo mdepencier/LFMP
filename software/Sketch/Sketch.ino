@@ -2,6 +2,7 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_TSL2561_U.h>
 
+// initialize motor pins
 int motorA = 12;
 int brakeA = 9;
 
@@ -43,26 +44,46 @@ void configureSensor(void)
 }
 
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(9600);
-
+  Serial.println("Line Following Music Player");
+  
   if(!tsl.begin()){
-    Serial.println("sensor not found");
+    Serial.print("no sensor detected");
     while(1);
   }
 
+  Serial.println("starting up...");
+
+  // display sensor information to serial
   displaySensorDetails();
 
+  // configure the sensor
   configureSensor();
-  
+
+  // configure motor pin modes
   pinMode(motorA, OUTPUT);
   pinMode(brakeA, OUTPUT);
-
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+
+  // set up sensor event
+  sensors_event_t event;
+
+  // get event data
+  tsl.getEvent(&event);
+
+  // if the event contains a value for light
+  if(event.light){
+    Serial.print(event.light); // print out the value of light intensity
+    Serial.println(" lux"); // in lux
+  } else {
+    Serial.println("Unable to read sensor...");
+  }
+  
   digitalWrite(motorA, HIGH);
   digitalWrite(brakeA, LOW);
-  analogWrite(3, 0);
+  analogWrite(3, 0); // motor speed (0-255 inclusive)
+  delay(250);
 }
