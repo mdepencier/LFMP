@@ -84,6 +84,12 @@ void loop() {
   
   digitalWrite(motorA, HIGH);
   digitalWrite(brakeA, LOW);
-  analogWrite(3, 0); // motor speed (0-255 inclusive)
+  if(event.light > 100)
+    analogWrite(3, 150); // motor speed (0-255 inclusive)
+   else
+    analogWrite(3, 0);
+
+//  analogWrite(3, 0);
+   
   delay(250);
 }
