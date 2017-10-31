@@ -6,6 +6,8 @@
 int motorA = 12;
 int brakeA = 9;
 
+int speaker = 5;
+
 Adafruit_TSL2561_Unified tsl = Adafruit_TSL2561_Unified(TSL2561_ADDR_FLOAT, 12345);
 
 void displaySensorDetails(void)
@@ -52,6 +54,10 @@ void setup() {
     while(1);
   }
 
+  for (int i=0;i<8;i++){
+    pinMode(i,OUTPUT);
+  }
+
   Serial.println("starting up...");
 
   // display sensor information to serial
@@ -76,20 +82,27 @@ void loop() {
 
   // if the event contains a value for light
   if(event.light){
-    Serial.print(event.light); // print out the value of light intensity
-    Serial.println(" lux"); // in lux
+    // Serial.print(event.light); // print out the value of light intensity
+    // Serial.println(" lux"); // in lux
   } else {
     Serial.println("Unable to read sensor...");
   }
   
-  digitalWrite(motorA, HIGH);
-  digitalWrite(brakeA, LOW);
-  if(event.light > 100)
-    analogWrite(3, 150); // motor speed (0-255 inclusive)
-   else
-    analogWrite(3, 0);
+//  digitalWrite(motorA, HIGH);
+//  digitalWrite(brakeA, LOW);
+  
+  int result = event.light + 5;
+  result -= result % 10;
 
-//  analogWrite(3, 0);
-   
-  delay(250);
+  Serial.println(event.light);
+
+//  for (int a=0;a<256;a++){
+//    PORTD = a;//send out ramp to digital pins 0-7
+//    Serial.println(a);
+//    delay(10);//wait 5ms
+//  }
+
+  PORTD = event.light;
+  
+  delay(40);
 }
