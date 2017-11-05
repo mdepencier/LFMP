@@ -3,8 +3,14 @@
 #include <Adafruit_TSL2561_U.h>
 
 // initialize motor pins
-int motorA = 12;
+int motorA = 3;
 int brakeA = 9;
+int motorB = 11;
+int brakeB = 8;
+int dirA = 12;
+int dirB = 13;
+
+boolean bit3state;
 
 int speaker = 5;
 
@@ -58,6 +64,8 @@ void setup() {
     pinMode(i,OUTPUT);
   }
 
+  pinMode(10, OUTPUT);
+
   Serial.println("starting up...");
 
   // display sensor information to serial
@@ -69,40 +77,44 @@ void setup() {
   // configure motor pin modes
   pinMode(motorA, OUTPUT);
   pinMode(brakeA, OUTPUT);
+  pinMode(brakeB, OUTPUT);
+  pinMode(motorB, OUTPUT);
+
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
 
   // set up sensor event
   sensors_event_t event;
+  int result;
 
-  // get event data
   tsl.getEvent(&event);
 
-  // if the event contains a value for light
+  result = event.light*10;
+
+  if(event.light > 255)
+    result = 255*10;
+
   if(event.light){
-    // Serial.print(event.light); // print out the value of light intensity
-    // Serial.println(" lux"); // in lux
+     Serial.print(result); // print out the value of light intensity
+     Serial.println(" lux"); // in lux
   } else {
     Serial.println("Unable to read sensor...");
   }
-  
-//  digitalWrite(motorA, HIGH);
-//  digitalWrite(brakeA, LOW);
-  
-  int result = event.light + 5;
-  result -= result % 10;
 
-  Serial.println(event.light);
+  int a = 30000/(2*result);
 
-//  for (int a=0;a<256;a++){
-//    PORTD = a;//send out ramp to digital pins 0-7
-//    Serial.println(a);
-//    delay(10);//wait 5ms
-//  }
+  bit3state = (36 & B00001000)>>3;//get the third bit of 36
 
-  PORTD = event.light;
+  for(int j = 0; j < 20; j++){
+    for(int i = 0; i < a; i++){
+      PORTD = 255;
+      delayMicroseconds(result);
+      PORTD = 0;
+      delayMicroseconds(result);
+    }
+  }
+
+  // good enough
   
-  delay(40);
 }
