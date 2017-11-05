@@ -79,6 +79,7 @@ void setup() {
   pinMode(brakeA, OUTPUT);
   pinMode(brakeB, OUTPUT);
   pinMode(motorB, OUTPUT);
+  pinMode(12, OUTPUT);
 
 }
 
@@ -90,10 +91,10 @@ void loop() {
 
   tsl.getEvent(&event);
 
-  result = event.light*10;
+  result = event.light*20;
 
   if(event.light > 255)
-    result = 255*10;
+    result = 255*20;
 
   if(event.light){
      Serial.print(result); // print out the value of light intensity
@@ -104,17 +105,22 @@ void loop() {
 
   int a = 30000/(2*result);
 
-  bit3state = (36 & B00001000)>>3;//get the third bit of 36
+  digitalWrite(13, HIGH);
+  digitalWrite(brakeB, LOW);
+  digitalWrite(brakeA, LOW);
+  analogWrite(motorA, 0);
+  analogWrite(motorB, 0);
 
-  for(int j = 0; j < 20; j++){
+  for(int j = 0; j < 30; j++){
     for(int i = 0; i < a; i++){
       PORTD = 255;
       delayMicroseconds(result);
-      PORTD = 0;
+      PORTD = B00001000;
       delayMicroseconds(result);
     }
   }
 
+  // pin 3 always HIGH but
   // good enough
   
 }
